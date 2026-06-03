@@ -13,6 +13,10 @@ export async function cleanDatabase(prisma: PrismaService): Promise<void> {
     prisma.refreshToken.deleteMany(),
     prisma.user.deleteMany(),
     prisma.uploadedFile.deleteMany(),
+    prisma.postAttachment.deleteMany(),
+    prisma.comment.deleteMany(),
+    prisma.post.deleteMany(),
+    prisma.board.deleteMany(),
   ]);
 
   await prisma.$executeRawUnsafe('SET FOREIGN_KEY_CHECKS = 1');
