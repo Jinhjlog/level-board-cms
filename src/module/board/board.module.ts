@@ -25,19 +25,25 @@ import {
   PostQueryServiceImpl,
   UserLevelLookupServiceImpl,
 } from './infra/services';
+import { CreateBoardUseCase } from './application/usecases/create-board.usecase';
+import { FindBoardListUseCase } from './application/usecases/find-board-list.usecase';
 import {
-  FindBoardListUseCase,
   FindPostListUseCase,
   FindPostDetailUseCase,
-  FindAdminBoardListUseCase,
+  CreatePostUseCase,
+  UpdateBoardUseCase,
+  DeleteBoardUseCase,
   UpdatePostUseCase,
+  FindAdminBoardListUseCase,
 } from './application/usecases';
+import { FileUploadModule } from '../file-upload/file-upload.module';
 
 /**
  * 게시판 CMS BC (board).
  * G단계: FindBoardListUseCase(SPEC 4.5) 추가.
  */
 @Module({
+  imports: [FileUploadModule],
   controllers: [
     AdminBoardController,
     BoardController,
@@ -51,11 +57,15 @@ import {
     { provide: BoardQueryService, useClass: BoardQueryServiceImpl },
     { provide: PostQueryService, useClass: PostQueryServiceImpl },
     { provide: UserLevelLookupService, useClass: UserLevelLookupServiceImpl },
+    CreateBoardUseCase,
     FindBoardListUseCase,
     FindPostListUseCase,
     FindPostDetailUseCase,
     FindAdminBoardListUseCase,
     UpdatePostUseCase,
+    DeleteBoardUseCase,
+    UpdateBoardUseCase,
+    CreatePostUseCase,
   ],
 })
 export class BoardModule {}

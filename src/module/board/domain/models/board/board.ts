@@ -49,6 +49,29 @@ export class Board extends AggregateRoot<BoardProps> {
     return this.props.updatedAt;
   }
 
+  /**
+   * 게시판 정보를 수정합니다.
+   * undefined인 필드는 변경하지 않고, managerId에 null을 전달하면 관리자를 해제합니다.
+   */
+  update(params: {
+    name?: BoundedString;
+    readLevel?: Level;
+    writeLevel?: Level;
+    commentLevel?: Level;
+    managerId?: string | null;
+  }): void {
+    if (params.name !== undefined) this.props.name = params.name;
+    if (params.readLevel !== undefined) this.props.readLevel = params.readLevel;
+    if (params.writeLevel !== undefined)
+      this.props.writeLevel = params.writeLevel;
+    if (params.commentLevel !== undefined)
+      this.props.commentLevel = params.commentLevel;
+    if (params.managerId !== undefined)
+      this.props.managerId =
+        params.managerId !== null ? params.managerId : undefined;
+    this.props.updatedAt = new Date();
+  }
+
   /** 새로운 게시판을 생성합니다. */
   static create(props: {
     name: BoundedString;
