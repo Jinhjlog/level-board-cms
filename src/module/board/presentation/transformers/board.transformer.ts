@@ -8,21 +8,6 @@ import { BoardDetailResponseDto } from '../dtos/response/board-detail.response.d
 
 /** 게시판 ReadModel → Response DTO 변환 */
 export class BoardTransformer {
-  static toDetailResponse(
-    detail: BoardDetailReadModel,
-  ): BoardDetailResponseDto {
-    return {
-      id: detail.id,
-      name: detail.name,
-      readLevel: detail.readLevel,
-      writeLevel: detail.writeLevel,
-      commentLevel: detail.commentLevel,
-      managerId: detail.managerId !== undefined ? detail.managerId : null,
-      createdAt: detail.createdAt,
-      updatedAt: detail.updatedAt,
-    };
-  }
-
   static toListResponse(result: BoardListResult): BoardListResponseDto {
     const items: BoardListItemResponseDto[] = result.items.map((item) => ({
       id: item.id,
@@ -37,6 +22,22 @@ export class BoardTransformer {
       totalCount: result.totalCount,
       totalPages: result.totalPages,
       currentPage: result.currentPage,
+    };
+  }
+
+  /** 게시판 상세 ReadModel → BoardDetailResponseDto 변환 */
+  static toDetailResponse(
+    detail: BoardDetailReadModel,
+  ): BoardDetailResponseDto {
+    return {
+      id: detail.id,
+      name: detail.name,
+      readLevel: detail.readLevel,
+      writeLevel: detail.writeLevel,
+      commentLevel: detail.commentLevel,
+      managerId: detail.managerId !== undefined ? detail.managerId : null,
+      createdAt: detail.createdAt,
+      updatedAt: detail.updatedAt,
     };
   }
 }

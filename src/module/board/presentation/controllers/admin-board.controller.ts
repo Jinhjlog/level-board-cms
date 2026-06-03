@@ -31,6 +31,7 @@ import {
   BoardDetailResponseDto,
 } from '../dtos/response';
 import { FindAdminBoardListUseCase } from '../../application/usecases/find-admin-board-list.usecase';
+import { UpdateBoardUseCase } from '../../application/usecases/update-board.usecase';
 import { CreateBoardUseCase } from '../../application/usecases/create-board.usecase';
 import { AdminBoardTransformer } from '../transformers/admin-board.transformer';
 import { BoardTransformer } from '../transformers/board.transformer';
@@ -44,6 +45,7 @@ import { BoardTransformer } from '../transformers/board.transformer';
 export class AdminBoardController {
   constructor(
     private readonly findAdminBoardListUseCase: FindAdminBoardListUseCase,
+    private readonly updateBoardUseCase: UpdateBoardUseCase,
     private readonly createBoardUseCase: CreateBoardUseCase,
   ) {}
   @ApiOperation({
@@ -104,11 +106,20 @@ export class AdminBoardController {
   })
   @HttpCode(HttpStatus.OK)
   @Patch(':boardId')
-  updateBoard(
-    @Param('boardId') _boardId: string,
-    @Body() _dto: UpdateBoardRequestDto,
-  ): BoardDetailResponseDto {
-    return MOCK_BOARD_DETAIL;
+  async updateBoard(
+    @Param('boardId') boardId: string,
+    @Body() dto: UpdateBoardRequestDto,
+  ): Promise<BoardDetailResponseDto> {
+    const result = await this.updateBoardUseCase.execute({
+      boardId,
+      name: dto.name,
+      readLevel: dto.readLevel,
+      writeLevel: dto.writeLevel,
+      commentLevel: dto.commentLevel,
+      managerId: dto.managerId,
+    });
+
+    return BoardTransformer.toDetailResponse(result);
   }
 
   @ApiOperation({
@@ -154,15 +165,3 @@ export class AdminBoardController {
     return AdminBoardTransformer.toListResponse(result);
   }
 }
-
-// --- D단계 Mock 데이터 (G단계에서 제거) ---
-const MOCK_BOARD_DETAIL: BoardDetailResponseDto = {
-  id: '01HXK3G5N7MZQR8BVWEY6JKFP4',
-  name: '공지사항',
-  readLevel: 1,
-  writeLevel: 1,
-  commentLevel: 1,
-  managerId: null,
-  createdAt: new Date('2026-01-01T00:00:00.000Z'),
-  updatedAt: new Date('2026-01-01T00:00:00.000Z'),
-};
