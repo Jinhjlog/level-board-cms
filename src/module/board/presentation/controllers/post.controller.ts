@@ -25,7 +25,10 @@ import {
   CommentDetailResponseDto,
   PostDetailResponseDto,
 } from '../dtos/response';
-import { FindPostDetailUseCase } from '../../application/usecases';
+import {
+  FindPostDetailUseCase,
+  DeletePostUseCase,
+} from '../../application/usecases';
 import { PostTransformer } from '../transformers/post.transformer';
 
 /**
@@ -36,7 +39,10 @@ import { PostTransformer } from '../transformers/post.transformer';
 @UserAuth()
 @Controller({ path: 'posts', version: '1' })
 export class PostController {
-  constructor(private readonly findPostDetailUseCase: FindPostDetailUseCase) {}
+  constructor(
+    private readonly findPostDetailUseCase: FindPostDetailUseCase,
+    private readonly deletePostUseCase: DeletePostUseCase,
+  ) {}
   @ApiOperation({
     summary: '글 상세 조회',
     description:
@@ -121,8 +127,11 @@ export class PostController {
   })
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':postId')
-  deletePost(@Param('postId') _postId: string): void {
-    return;
+  async deletePost(
+    @Param('postId') postId: string,
+    @CurrentUser('userId') userId: string,
+  ): Promise<void> {
+    await this.deletePostUseCase.execute({ postId, userId });
   }
 
   @ApiOperation({
