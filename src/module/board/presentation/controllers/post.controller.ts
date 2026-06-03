@@ -25,8 +25,12 @@ import {
   CommentDetailResponseDto,
   PostDetailResponseDto,
 } from '../dtos/response';
-import { FindPostDetailUseCase } from '../../application/usecases';
+import {
+  CreateCommentUseCase,
+  FindPostDetailUseCase,
+} from '../../application/usecases';
 import { PostTransformer } from '../transformers/post.transformer';
+import { CommentTransformer } from '../transformers/comment.transformer';
 
 /**
  * 글 상세/수정/삭제 + 댓글 작성 — SPEC 4.7/4.9/4.10/4.11.
@@ -36,7 +40,10 @@ import { PostTransformer } from '../transformers/post.transformer';
 @UserAuth()
 @Controller({ path: 'posts', version: '1' })
 export class PostController {
-  constructor(private readonly findPostDetailUseCase: FindPostDetailUseCase) {}
+  constructor(
+    private readonly findPostDetailUseCase: FindPostDetailUseCase,
+    private readonly createCommentUseCase: CreateCommentUseCase,
+  ) {}
   @ApiOperation({
     summary: '글 상세 조회',
     description:
@@ -147,16 +154,21 @@ export class PostController {
   })
   @HttpCode(HttpStatus.CREATED)
   @Post(':postId/comments')
-  createComment(
-    @Param('postId') _postId: string,
-    @Body() _dto: CreateCommentRequestDto,
-    @CurrentUser('userId') _userId: string,
-  ): CommentDetailResponseDto {
-    return MOCK_COMMENT_DETAIL;
+  async createComment(
+    @Param('postId') postId: string,
+    @Body() dto: CreateCommentRequestDto,
+    @CurrentUser('userId') userId: string,
+  ): Promise<CommentDetailResponseDto> {
+    const comment = await this.createCommentUseCase.execute({
+      postId,
+      userId,
+      content: dto.content,
+    });
+    return CommentTransformer.toDetailResponse(comment);
   }
 }
 
-// --- D단계 Mock 데이터 (G단계에서 제거) ---
+// --- D단계 Mock 데이터 (G단계에서 순차 제거) ---
 const MOCK_POST_DETAIL: PostDetailResponseDto = {
   id: '01HXK3G5N7MZQR8BVWEY6JKFP4',
   boardId: '01HXK3G5N7MZQR8BVWEY6JKFP4',
@@ -165,12 +177,4 @@ const MOCK_POST_DETAIL: PostDetailResponseDto = {
   authorId: '01HXK3G5N7MZQR8BVWEY6JKFP4',
   createdAt: new Date('2026-01-01T00:00:00.000Z'),
   attachments: [],
-};
-
-const MOCK_COMMENT_DETAIL: CommentDetailResponseDto = {
-  id: '01HXK3G5N7MZQR8BVWEY6JKFP4',
-  postId: '01HXK3G5N7MZQR8BVWEY6JKFP4',
-  authorId: '01HXK3G5N7MZQR8BVWEY6JKFP4',
-  content: '좋은 글 감사합니다.',
-  createdAt: new Date('2026-01-01T00:00:00.000Z'),
 };
