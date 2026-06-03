@@ -26,11 +26,13 @@ import {
   PostDetailResponseDto,
 } from '../dtos/response';
 import {
+  CreateCommentUseCase,
   FindPostDetailUseCase,
   DeletePostUseCase,
   UpdatePostUseCase,
 } from '../../application/usecases';
 import { PostTransformer } from '../transformers/post.transformer';
+import { CommentTransformer } from '../transformers/comment.transformer';
 
 /**
  * 글 상세/수정/삭제 + 댓글 작성 — SPEC 4.7/4.9/4.10/4.11.
@@ -42,6 +44,7 @@ import { PostTransformer } from '../transformers/post.transformer';
 export class PostController {
   constructor(
     private readonly findPostDetailUseCase: FindPostDetailUseCase,
+    private readonly createCommentUseCase: CreateCommentUseCase,
     private readonly deletePostUseCase: DeletePostUseCase,
     private readonly updatePostUseCase: UpdatePostUseCase,
   ) {}
@@ -164,20 +167,16 @@ export class PostController {
   })
   @HttpCode(HttpStatus.CREATED)
   @Post(':postId/comments')
-  createComment(
-    @Param('postId') _postId: string,
-    @Body() _dto: CreateCommentRequestDto,
-    @CurrentUser('userId') _userId: string,
-  ): CommentDetailResponseDto {
-    return MOCK_COMMENT_DETAIL;
+  async createComment(
+    @Param('postId') postId: string,
+    @Body() dto: CreateCommentRequestDto,
+    @CurrentUser('userId') userId: string,
+  ): Promise<CommentDetailResponseDto> {
+    const comment = await this.createCommentUseCase.execute({
+      postId,
+      userId,
+      content: dto.content,
+    });
+    return CommentTransformer.toDetailResponse(comment);
   }
 }
-
-// --- D단계 Mock 데이터 (createComment는 G단계 미구현으로 유지) ---
-const MOCK_COMMENT_DETAIL: CommentDetailResponseDto = {
-  id: '01HXK3G5N7MZQR8BVWEY6JKFP4',
-  postId: '01HXK3G5N7MZQR8BVWEY6JKFP4',
-  authorId: '01HXK3G5N7MZQR8BVWEY6JKFP4',
-  content: '좋은 글 감사합니다.',
-  createdAt: new Date('2026-01-01T00:00:00.000Z'),
-};
