@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   HttpCode,
@@ -15,14 +16,20 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
-import { AdminAuth } from '../../../admin/presentation/decorators/admin-auth.decorator';
+import {
+  AdminAuth,
+  RequireSuperAdmin,
+} from '../../../admin/presentation/decorators';
 import { FindAdminUserListUseCase } from '../../application/usecases/find-admin-user-list.usecase';
 import { FindAdminUserDetailUseCase } from '../../application/usecases/find-admin-user-detail.usecase';
 import { ActivateUserUseCase } from '../../application/usecases/activate-user.usecase';
 import { DeactivateUserUseCase } from '../../application/usecases/deactivate-user.usecase';
+import { ChangeUserLevelUseCase } from '../../application/usecases/change-user-level.usecase';
 import { GetAdminUserListRequestDto } from '../dtos/request/get-admin-user-list.request.dto';
+import { ChangeUserLevelRequestDto } from '../dtos/request/change-user-level.request.dto';
 import { AdminUserListResponseDto } from '../dtos/response/admin-user-list.response.dto';
 import { AdminUserDetailResponseDto } from '../dtos/response/admin-user-detail.response.dto';
+import { UserLevelResponseDto } from '../dtos/response/user-level.response.dto';
 import { AdminUserTransformer } from '../transformers/admin-user.transformer';
 
 @ApiTags('관리자 - 회원 관리')
@@ -34,6 +41,7 @@ export class AdminUserController {
     private readonly findAdminUserDetailUseCase: FindAdminUserDetailUseCase,
     private readonly activateUserUseCase: ActivateUserUseCase,
     private readonly deactivateUserUseCase: DeactivateUserUseCase,
+    private readonly changeUserLevelUseCase: ChangeUserLevelUseCase,
   ) {}
 
   @ApiOperation({
@@ -116,6 +124,37 @@ export class AdminUserController {
   @Patch(':userId/deactivate')
   async deactivateUser(@Param('userId') userId: string): Promise<void> {
     await this.deactivateUserUseCase.execute(userId);
+  }
+
+  @ApiOperation({
+    summary: '회원 레벨 조정 [최고관리자]',
+    description:
+      'SUPER_ADMIN이 회원의 레벨(1~10)을 변경합니다. ' +
+      '회원 레벨은 게시판(board) 접근 레벨 게이트(읽기/쓰기/댓글)에 사용됩니다.',
+  })
+  @ApiParam({
+    name: 'userId',
+    description: '회원 ID (ULID)',
+    example: '01HXK3G5N7MZQR8BVWEY6JKFP4',
+  })
+  @ApiOkResponse({
+    description: '회원 레벨 조정 성공',
+    type: UserLevelResponseDto,
+  })
+  @ApiBadRequestResponse({
+    description: '레벨이 1~10 범위를 벗어남: _**INVALID_USER_LEVEL**_',
+  })
+  @ApiNotFoundResponse({
+    description: '회원을 찾을 수 없음: _**USER_NOT_FOUND**_',
+  })
+  @RequireSuperAdmin()
+  @HttpCode(HttpStatus.OK)
+  @Patch(':userId/level')
+  async changeUserLevel(
+    @Param('userId') userId: string,
+    @Body() dto: ChangeUserLevelRequestDto,
+  ): Promise<UserLevelResponseDto> {
+    return this.changeUserLevelUseCase.execute(userId, dto.level);
   }
 
   @ApiOperation({
