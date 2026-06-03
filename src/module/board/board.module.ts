@@ -5,7 +5,6 @@ import {
   PostController,
   CommentController,
 } from './presentation/controllers';
-import { FindAdminBoardListUseCase } from './application/usecases/find-admin-board-list.usecase';
 import {
   BoardRepository,
   PostRepository,
@@ -26,9 +25,13 @@ import {
   PostQueryServiceImpl,
   UserLevelLookupServiceImpl,
 } from './infra/services';
-import { FindBoardListUseCase } from './application/usecases/find-board-list.usecase';
-import { FindPostListUseCase } from './application/usecases';
-import { FindPostDetailUseCase } from './application/usecases';
+import {
+  FindBoardListUseCase,
+  FindPostListUseCase,
+  FindPostDetailUseCase,
+  FindAdminBoardListUseCase,
+  UpdatePostUseCase,
+} from './application/usecases';
 
 /**
  * 게시판 CMS BC (board).
@@ -52,6 +55,7 @@ import { FindPostDetailUseCase } from './application/usecases';
     FindPostListUseCase,
     FindPostDetailUseCase,
     FindAdminBoardListUseCase,
+    UpdatePostUseCase,
   ],
 })
 export class BoardModule {}
