@@ -25,7 +25,10 @@ import {
   CommentDetailResponseDto,
   PostDetailResponseDto,
 } from '../dtos/response';
-import { FindPostDetailUseCase } from '../../application/usecases';
+import {
+  FindPostDetailUseCase,
+  UpdatePostUseCase,
+} from '../../application/usecases';
 import { PostTransformer } from '../transformers/post.transformer';
 
 /**
@@ -36,7 +39,10 @@ import { PostTransformer } from '../transformers/post.transformer';
 @UserAuth()
 @Controller({ path: 'posts', version: '1' })
 export class PostController {
-  constructor(private readonly findPostDetailUseCase: FindPostDetailUseCase) {}
+  constructor(
+    private readonly findPostDetailUseCase: FindPostDetailUseCase,
+    private readonly updatePostUseCase: UpdatePostUseCase,
+  ) {}
   @ApiOperation({
     summary: '글 상세 조회',
     description:
@@ -93,12 +99,18 @@ export class PostController {
   })
   @HttpCode(HttpStatus.OK)
   @Patch(':postId')
-  updatePost(
-    @Param('postId') _postId: string,
-    @Body() _dto: UpdatePostRequestDto,
-    @CurrentUser('userId') _userId: string,
-  ): PostDetailResponseDto {
-    return MOCK_POST_DETAIL;
+  async updatePost(
+    @Param('postId') postId: string,
+    @Body() dto: UpdatePostRequestDto,
+    @CurrentUser('userId') userId: string,
+  ): Promise<PostDetailResponseDto> {
+    const readModel = await this.updatePostUseCase.execute({
+      postId,
+      userId,
+      title: dto.title,
+      content: dto.content,
+    });
+    return PostTransformer.toDetailResponse(readModel);
   }
 
   @ApiOperation({
@@ -156,17 +168,7 @@ export class PostController {
   }
 }
 
-// --- D단계 Mock 데이터 (G단계에서 제거) ---
-const MOCK_POST_DETAIL: PostDetailResponseDto = {
-  id: '01HXK3G5N7MZQR8BVWEY6JKFP4',
-  boardId: '01HXK3G5N7MZQR8BVWEY6JKFP4',
-  title: '첫 번째 글입니다',
-  content: '본문 내용입니다.',
-  authorId: '01HXK3G5N7MZQR8BVWEY6JKFP4',
-  createdAt: new Date('2026-01-01T00:00:00.000Z'),
-  attachments: [],
-};
-
+// --- D단계 Mock 데이터 (createComment는 G단계 미구현으로 유지) ---
 const MOCK_COMMENT_DETAIL: CommentDetailResponseDto = {
   id: '01HXK3G5N7MZQR8BVWEY6JKFP4',
   postId: '01HXK3G5N7MZQR8BVWEY6JKFP4',
