@@ -13,6 +13,7 @@ import { UserAuthGuardModule } from './user/user-auth-guard.module';
 import { UserAuthModule } from './user/user-auth.module';
 import { UserModule } from './user/user.module';
 import { FileUploadModule } from './file-upload/file-upload.module';
+import { BoardModule } from './board/board.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { FileUploadModule } from './file-upload/file-upload.module';
 
     // Feature
     FileUploadModule,
+    BoardModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
