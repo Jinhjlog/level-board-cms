@@ -69,6 +69,16 @@ export class Post extends AggregateRoot<PostProps> {
     });
   }
 
+  /**
+   * 글 제목/내용을 수정합니다.
+   * undefined인 필드는 변경하지 않습니다.
+   */
+  update(params: { title?: BoundedString; content?: BoundedString }): void {
+    if (params.title !== undefined) this.props.title = params.title;
+    if (params.content !== undefined) this.props.content = params.content;
+    this.props.updatedAt = new Date();
+  }
+
   /** DB에서 복원합니다 (Mapper 전용, 검증 없음). */
   static unsafeCreate(props: PostProps): Post {
     return new Post(props);

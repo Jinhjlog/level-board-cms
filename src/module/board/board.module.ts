@@ -5,7 +5,6 @@ import {
   PostController,
   CommentController,
 } from './presentation/controllers';
-import { FindAdminBoardListUseCase } from './application/usecases/find-admin-board-list.usecase';
 import {
   BoardRepository,
   PostRepository,
@@ -26,11 +25,17 @@ import {
   PostQueryServiceImpl,
   UserLevelLookupServiceImpl,
 } from './infra/services';
+import { CreateBoardUseCase } from './application/usecases/create-board.usecase';
 import { FindBoardListUseCase } from './application/usecases/find-board-list.usecase';
 import {
   FindPostListUseCase,
   FindPostDetailUseCase,
+  CreatePostUseCase,
+  UpdateBoardUseCase,
+  DeleteBoardUseCase,
+  UpdatePostUseCase,
   DeletePostUseCase,
+  FindAdminBoardListUseCase,
 } from './application/usecases';
 import { FileUploadModule } from '../file-upload/file-upload.module';
 
@@ -53,11 +58,16 @@ import { FileUploadModule } from '../file-upload/file-upload.module';
     { provide: BoardQueryService, useClass: BoardQueryServiceImpl },
     { provide: PostQueryService, useClass: PostQueryServiceImpl },
     { provide: UserLevelLookupService, useClass: UserLevelLookupServiceImpl },
+    CreateBoardUseCase,
     FindBoardListUseCase,
     FindPostListUseCase,
     FindPostDetailUseCase,
     FindAdminBoardListUseCase,
     DeletePostUseCase,
+    UpdatePostUseCase,
+    DeleteBoardUseCase,
+    UpdateBoardUseCase,
+    CreatePostUseCase,
   ],
 })
 export class BoardModule {}
