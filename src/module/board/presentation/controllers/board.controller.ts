@@ -31,6 +31,8 @@ import {
 } from '../dtos/response';
 import { FindBoardListUseCase } from '../../application/usecases/find-board-list.usecase';
 import { BoardTransformer } from '../transformers/board.transformer';
+import { FindPostListUseCase } from '../../application/usecases';
+import { PostTransformer } from '../transformers/post.transformer';
 
 /**
  * 회원용 게시판/글 (게시판 목록·글 목록·글 작성) — SPEC 4.5/4.6/4.8.
@@ -39,7 +41,11 @@ import { BoardTransformer } from '../transformers/board.transformer';
 @UserAuth()
 @Controller({ path: 'boards', version: '1' })
 export class BoardController {
-  constructor(private readonly findBoardListUseCase: FindBoardListUseCase) {}
+  constructor(
+    private readonly findBoardListUseCase: FindBoardListUseCase,
+    private readonly findPostListUseCase: FindPostListUseCase,
+  ) {}
+
   @ApiOperation({
     summary: '게시판 목록 조회',
     description:
@@ -88,11 +94,20 @@ export class BoardController {
   })
   @HttpCode(HttpStatus.OK)
   @Get(':boardId/posts')
-  getPostList(
-    @Param('boardId') _boardId: string,
-    @Query() _dto: GetPostListRequestDto,
-  ): PostListResponseDto {
-    return MOCK_POST_LIST;
+  async getPostList(
+    @Param('boardId') boardId: string,
+    @Query() dto: GetPostListRequestDto,
+    @CurrentUser('userId') userId: string,
+  ): Promise<PostListResponseDto> {
+    const result = await this.findPostListUseCase.execute({
+      boardId,
+      userId,
+      page: dto.page ?? 1,
+      limit: dto.limit ?? 20,
+      keyword: dto.keyword,
+    });
+
+    return PostTransformer.toListResponse(result);
   }
 
   @ApiOperation({
@@ -132,14 +147,6 @@ export class BoardController {
     return MOCK_POST_DETAIL;
   }
 }
-
-// --- D단계 Mock 데이터 (getBoardList는 G단계에서 제거됨) ---
-const MOCK_POST_LIST: PostListResponseDto = {
-  items: [],
-  totalCount: 0,
-  totalPages: 0,
-  currentPage: 1,
-};
 
 const MOCK_POST_DETAIL: PostDetailResponseDto = {
   id: '01HXK3G5N7MZQR8BVWEY6JKFP4',

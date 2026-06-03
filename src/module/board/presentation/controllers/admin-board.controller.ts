@@ -30,15 +30,19 @@ import {
   AdminBoardListResponseDto,
   BoardDetailResponseDto,
 } from '../dtos/response';
+import { FindAdminBoardListUseCase } from '../../application/usecases/find-admin-board-list.usecase';
+import { AdminBoardTransformer } from '../transformers/admin-board.transformer';
 
 /**
  * 게시판 관리 (최고관리자 전용) — SPEC 4.1~4.4.
- * ⚠️ D단계 Mock: 핸들러는 계약 형태의 더미를 반환한다. 실제 동작은 G단계에서 UseCase 연결.
  */
 @ApiTags('관리자 - 게시판 관리')
 @RequireSuperAdmin()
 @Controller({ path: 'admin/boards', version: '1' })
 export class AdminBoardController {
+  constructor(
+    private readonly findAdminBoardListUseCase: FindAdminBoardListUseCase,
+  ) {}
   @ApiOperation({
     summary: '게시판 생성 [최고관리자]',
     description:
@@ -126,10 +130,15 @@ export class AdminBoardController {
   })
   @HttpCode(HttpStatus.OK)
   @Get()
-  getBoardList(
-    @Query() _dto: GetBoardListRequestDto,
-  ): AdminBoardListResponseDto {
-    return MOCK_ADMIN_BOARD_LIST;
+  async getBoardList(
+    @Query() dto: GetBoardListRequestDto,
+  ): Promise<AdminBoardListResponseDto> {
+    const result = await this.findAdminBoardListUseCase.execute({
+      page: dto.page ?? 1,
+      limit: dto.limit ?? 20,
+    });
+
+    return AdminBoardTransformer.toListResponse(result);
   }
 }
 
@@ -143,11 +152,4 @@ const MOCK_BOARD_DETAIL: BoardDetailResponseDto = {
   managerId: null,
   createdAt: new Date('2026-01-01T00:00:00.000Z'),
   updatedAt: new Date('2026-01-01T00:00:00.000Z'),
-};
-
-const MOCK_ADMIN_BOARD_LIST: AdminBoardListResponseDto = {
-  items: [],
-  totalCount: 0,
-  totalPages: 0,
-  currentPage: 1,
 };
