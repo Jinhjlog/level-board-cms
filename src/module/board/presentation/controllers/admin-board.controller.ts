@@ -31,7 +31,9 @@ import {
   BoardDetailResponseDto,
 } from '../dtos/response';
 import { FindAdminBoardListUseCase } from '../../application/usecases/find-admin-board-list.usecase';
+import { UpdateBoardUseCase } from '../../application/usecases/update-board.usecase';
 import { AdminBoardTransformer } from '../transformers/admin-board.transformer';
+import { BoardTransformer } from '../transformers/board.transformer';
 
 /**
  * 게시판 관리 (최고관리자 전용) — SPEC 4.1~4.4.
@@ -42,6 +44,7 @@ import { AdminBoardTransformer } from '../transformers/admin-board.transformer';
 export class AdminBoardController {
   constructor(
     private readonly findAdminBoardListUseCase: FindAdminBoardListUseCase,
+    private readonly updateBoardUseCase: UpdateBoardUseCase,
   ) {}
   @ApiOperation({
     summary: '게시판 생성 [최고관리자]',
@@ -91,11 +94,20 @@ export class AdminBoardController {
   })
   @HttpCode(HttpStatus.OK)
   @Patch(':boardId')
-  updateBoard(
-    @Param('boardId') _boardId: string,
-    @Body() _dto: UpdateBoardRequestDto,
-  ): BoardDetailResponseDto {
-    return MOCK_BOARD_DETAIL;
+  async updateBoard(
+    @Param('boardId') boardId: string,
+    @Body() dto: UpdateBoardRequestDto,
+  ): Promise<BoardDetailResponseDto> {
+    const result = await this.updateBoardUseCase.execute({
+      boardId,
+      name: dto.name,
+      readLevel: dto.readLevel,
+      writeLevel: dto.writeLevel,
+      commentLevel: dto.commentLevel,
+      managerId: dto.managerId,
+    });
+
+    return BoardTransformer.toDetailResponse(result);
   }
 
   @ApiOperation({
