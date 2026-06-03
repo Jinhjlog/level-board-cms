@@ -11,6 +11,8 @@ interface SeedUserOptions {
   name?: string;
   phone?: string;
   isActive?: boolean;
+  /** 회원 레벨 (1~10, board 레벨 게이트 검증용). 기본 1 */
+  level?: number;
 }
 
 interface SeededUser {
@@ -19,6 +21,7 @@ interface SeededUser {
   name: string | null;
   phone: string | null;
   isActive: boolean;
+  level: number;
 }
 
 /** 테스트용 사용자를 DB에 생성합니다. */
@@ -38,6 +41,7 @@ export async function seedUser(
       name: overrides.name ?? null,
       phone: overrides.phone ?? null,
       isActive: overrides.isActive ?? true,
+      level: overrides.level ?? 1,
     },
   });
 
@@ -47,5 +51,6 @@ export async function seedUser(
     name: user.name,
     phone: user.phone,
     isActive: user.isActive,
+    level: user.level,
   };
 }
