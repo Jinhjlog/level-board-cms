@@ -31,7 +31,9 @@ import {
   BoardDetailResponseDto,
 } from '../dtos/response';
 import { FindAdminBoardListUseCase } from '../../application/usecases/find-admin-board-list.usecase';
+import { CreateBoardUseCase } from '../../application/usecases/create-board.usecase';
 import { AdminBoardTransformer } from '../transformers/admin-board.transformer';
+import { BoardTransformer } from '../transformers/board.transformer';
 
 /**
  * 게시판 관리 (최고관리자 전용) — SPEC 4.1~4.4.
@@ -42,6 +44,7 @@ import { AdminBoardTransformer } from '../transformers/admin-board.transformer';
 export class AdminBoardController {
   constructor(
     private readonly findAdminBoardListUseCase: FindAdminBoardListUseCase,
+    private readonly createBoardUseCase: CreateBoardUseCase,
   ) {}
   @ApiOperation({
     summary: '게시판 생성 [최고관리자]',
@@ -62,8 +65,18 @@ export class AdminBoardController {
   })
   @HttpCode(HttpStatus.CREATED)
   @Post()
-  createBoard(@Body() _dto: CreateBoardRequestDto): BoardDetailResponseDto {
-    return MOCK_BOARD_DETAIL;
+  async createBoard(
+    @Body() dto: CreateBoardRequestDto,
+  ): Promise<BoardDetailResponseDto> {
+    const detail = await this.createBoardUseCase.execute({
+      name: dto.name,
+      readLevel: dto.readLevel,
+      writeLevel: dto.writeLevel,
+      commentLevel: dto.commentLevel,
+      managerId: dto.managerId,
+    });
+
+    return BoardTransformer.toDetailResponse(detail);
   }
 
   @ApiOperation({
