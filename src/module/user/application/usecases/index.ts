@@ -7,3 +7,4 @@ export * from './find-admin-user-list.usecase';
 export * from './find-admin-user-detail.usecase';
 export * from './deactivate-user.usecase';
 export * from './activate-user.usecase';
+export * from './change-user-level.usecase';
