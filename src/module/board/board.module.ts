@@ -5,7 +5,6 @@ import {
   PostController,
   CommentController,
 } from './presentation/controllers';
-import { FindAdminBoardListUseCase } from './application/usecases/find-admin-board-list.usecase';
 import {
   BoardRepository,
   PostRepository,
@@ -34,6 +33,8 @@ import {
   CreatePostUseCase,
   UpdateBoardUseCase,
   DeleteBoardUseCase,
+  UpdatePostUseCase,
+  FindAdminBoardListUseCase,
 } from './application/usecases';
 import { FileUploadModule } from '../file-upload/file-upload.module';
 
@@ -61,6 +62,7 @@ import { FileUploadModule } from '../file-upload/file-upload.module';
     FindPostListUseCase,
     FindPostDetailUseCase,
     FindAdminBoardListUseCase,
+    UpdatePostUseCase,
     DeleteBoardUseCase,
     UpdateBoardUseCase,
     CreatePostUseCase,
