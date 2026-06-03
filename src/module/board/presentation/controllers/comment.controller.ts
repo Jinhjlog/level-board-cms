@@ -13,20 +13,22 @@ import {
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
-import { UserAuth } from '../../../user/presentation/decorators';
+import { UserAuth, CurrentUser } from '../../../user/presentation/decorators';
+import { DeleteCommentUseCase } from '../../application/usecases';
 
 /**
  * 댓글 삭제 — SPEC 4.12.
- * ⚠️ D단계 Mock: 핸들러는 더미(204)만 반환. 권한 판정은 G단계 UseCase에서.
  */
 @ApiTags('댓글')
 @UserAuth()
 @Controller({ path: 'comments', version: '1' })
 export class CommentController {
+  constructor(private readonly deleteCommentUseCase: DeleteCommentUseCase) {}
+
   @ApiOperation({
     summary: '댓글 삭제',
     description:
-      '작성자 본인, 글이 속한 게시판의 관리자(managerId), 또는 SUPER_ADMIN이 댓글을 삭제합니다.',
+      '작성자 본인 또는 글이 속한 게시판의 관리자(managerId)가 댓글을 삭제합니다.',
   })
   @ApiParam({
     name: 'commentId',
@@ -42,7 +44,10 @@ export class CommentController {
   })
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':commentId')
-  deleteComment(@Param('commentId') _commentId: string): void {
-    return;
+  async deleteComment(
+    @Param('commentId') commentId: string,
+    @CurrentUser('userId') userId: string,
+  ): Promise<void> {
+    await this.deleteCommentUseCase.execute({ commentId, userId });
   }
 }

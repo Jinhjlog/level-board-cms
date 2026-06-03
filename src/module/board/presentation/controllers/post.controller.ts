@@ -28,6 +28,8 @@ import {
 import {
   CreateCommentUseCase,
   FindPostDetailUseCase,
+  DeletePostUseCase,
+  UpdatePostUseCase,
 } from '../../application/usecases';
 import { PostTransformer } from '../transformers/post.transformer';
 import { CommentTransformer } from '../transformers/comment.transformer';
@@ -43,6 +45,8 @@ export class PostController {
   constructor(
     private readonly findPostDetailUseCase: FindPostDetailUseCase,
     private readonly createCommentUseCase: CreateCommentUseCase,
+    private readonly deletePostUseCase: DeletePostUseCase,
+    private readonly updatePostUseCase: UpdatePostUseCase,
   ) {}
   @ApiOperation({
     summary: '글 상세 조회',
@@ -100,12 +104,18 @@ export class PostController {
   })
   @HttpCode(HttpStatus.OK)
   @Patch(':postId')
-  updatePost(
-    @Param('postId') _postId: string,
-    @Body() _dto: UpdatePostRequestDto,
-    @CurrentUser('userId') _userId: string,
-  ): PostDetailResponseDto {
-    return MOCK_POST_DETAIL;
+  async updatePost(
+    @Param('postId') postId: string,
+    @Body() dto: UpdatePostRequestDto,
+    @CurrentUser('userId') userId: string,
+  ): Promise<PostDetailResponseDto> {
+    const readModel = await this.updatePostUseCase.execute({
+      postId,
+      userId,
+      title: dto.title,
+      content: dto.content,
+    });
+    return PostTransformer.toDetailResponse(readModel);
   }
 
   @ApiOperation({
@@ -128,8 +138,11 @@ export class PostController {
   })
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':postId')
-  deletePost(@Param('postId') _postId: string): void {
-    return;
+  async deletePost(
+    @Param('postId') postId: string,
+    @CurrentUser('userId') userId: string,
+  ): Promise<void> {
+    await this.deletePostUseCase.execute({ postId, userId });
   }
 
   @ApiOperation({
@@ -167,14 +180,3 @@ export class PostController {
     return CommentTransformer.toDetailResponse(comment);
   }
 }
-
-// --- D단계 Mock 데이터 (G단계에서 순차 제거) ---
-const MOCK_POST_DETAIL: PostDetailResponseDto = {
-  id: '01HXK3G5N7MZQR8BVWEY6JKFP4',
-  boardId: '01HXK3G5N7MZQR8BVWEY6JKFP4',
-  title: '첫 번째 글입니다',
-  content: '본문 내용입니다.',
-  authorId: '01HXK3G5N7MZQR8BVWEY6JKFP4',
-  createdAt: new Date('2026-01-01T00:00:00.000Z'),
-  attachments: [],
-};
