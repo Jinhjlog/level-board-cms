@@ -35,6 +35,7 @@ import {
   DeleteBoardUseCase,
   UpdatePostUseCase,
   DeletePostUseCase,
+  DeleteCommentUseCase,
   FindAdminBoardListUseCase,
 } from './application/usecases';
 import { FileUploadModule } from '../file-upload/file-upload.module';
@@ -63,6 +64,7 @@ import { FileUploadModule } from '../file-upload/file-upload.module';
     FindPostListUseCase,
     FindPostDetailUseCase,
     FindAdminBoardListUseCase,
+    DeleteCommentUseCase,
     DeletePostUseCase,
     UpdatePostUseCase,
     DeleteBoardUseCase,
