@@ -31,6 +31,7 @@ import {
   BoardDetailResponseDto,
 } from '../dtos/response';
 import { FindAdminBoardListUseCase } from '../../application/usecases/find-admin-board-list.usecase';
+import { DeleteBoardUseCase } from '../../application/usecases/delete-board.usecase';
 import { UpdateBoardUseCase } from '../../application/usecases/update-board.usecase';
 import { CreateBoardUseCase } from '../../application/usecases/create-board.usecase';
 import { AdminBoardTransformer } from '../transformers/admin-board.transformer';
@@ -45,6 +46,7 @@ import { BoardTransformer } from '../transformers/board.transformer';
 export class AdminBoardController {
   constructor(
     private readonly findAdminBoardListUseCase: FindAdminBoardListUseCase,
+    private readonly deleteBoardUseCase: DeleteBoardUseCase,
     private readonly updateBoardUseCase: UpdateBoardUseCase,
     private readonly createBoardUseCase: CreateBoardUseCase,
   ) {}
@@ -138,8 +140,8 @@ export class AdminBoardController {
   })
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':boardId')
-  deleteBoard(@Param('boardId') _boardId: string): void {
-    return;
+  async deleteBoard(@Param('boardId') boardId: string): Promise<void> {
+    await this.deleteBoardUseCase.execute(boardId);
   }
 
   @ApiOperation({
