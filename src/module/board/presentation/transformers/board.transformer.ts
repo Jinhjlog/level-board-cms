@@ -1,9 +1,9 @@
+import { BoardDetailReadModel } from '../../domain/models/board/board-detail.read-model';
 import { BoardListResult } from '../../application/dtos/find-board-list.dto';
 import {
   BoardListResponseDto,
   BoardListItemResponseDto,
 } from '../dtos/response/board-list.response.dto';
-import { BoardDetailReadModel } from '../../domain/models/board/board-detail.read-model';
 import { BoardDetailResponseDto } from '../dtos/response/board-detail.response.dto';
 
 /** 게시판 ReadModel → Response DTO 변환 */
