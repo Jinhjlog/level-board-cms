@@ -31,7 +31,10 @@ import {
 } from '../dtos/response';
 import { FindBoardListUseCase } from '../../application/usecases/find-board-list.usecase';
 import { BoardTransformer } from '../transformers/board.transformer';
-import { FindPostListUseCase } from '../../application/usecases';
+import {
+  FindPostListUseCase,
+  CreatePostUseCase,
+} from '../../application/usecases';
 import { PostTransformer } from '../transformers/post.transformer';
 
 /**
@@ -44,6 +47,7 @@ export class BoardController {
   constructor(
     private readonly findBoardListUseCase: FindBoardListUseCase,
     private readonly findPostListUseCase: FindPostListUseCase,
+    private readonly createPostUseCase: CreatePostUseCase,
   ) {}
 
   @ApiOperation({
@@ -139,21 +143,18 @@ export class BoardController {
   })
   @HttpCode(HttpStatus.CREATED)
   @Post(':boardId/posts')
-  createPost(
-    @Param('boardId') _boardId: string,
-    @Body() _dto: CreatePostRequestDto,
-    @CurrentUser('userId') _userId: string,
-  ): PostDetailResponseDto {
-    return MOCK_POST_DETAIL;
+  async createPost(
+    @Param('boardId') boardId: string,
+    @Body() dto: CreatePostRequestDto,
+    @CurrentUser('userId') userId: string,
+  ): Promise<PostDetailResponseDto> {
+    const detail = await this.createPostUseCase.execute({
+      boardId,
+      authorId: userId,
+      title: dto.title,
+      content: dto.content,
+      attachmentIds: dto.attachmentIds,
+    });
+    return PostTransformer.toDetailResponse(detail);
   }
 }
-
-const MOCK_POST_DETAIL: PostDetailResponseDto = {
-  id: '01HXK3G5N7MZQR8BVWEY6JKFP4',
-  boardId: '01HXK3G5N7MZQR8BVWEY6JKFP4',
-  title: '첫 번째 글입니다',
-  content: '본문 내용입니다.',
-  authorId: '01HXK3G5N7MZQR8BVWEY6JKFP4',
-  createdAt: new Date('2026-01-01T00:00:00.000Z'),
-  attachments: [],
-};
