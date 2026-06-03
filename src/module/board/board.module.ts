@@ -5,6 +5,7 @@ import {
   PostController,
   CommentController,
 } from './presentation/controllers';
+import { FindAdminBoardListUseCase } from './application/usecases/find-admin-board-list.usecase';
 import {
   BoardRepository,
   PostRepository,
@@ -45,6 +46,7 @@ import {
     { provide: BoardQueryService, useClass: BoardQueryServiceImpl },
     { provide: PostQueryService, useClass: PostQueryServiceImpl },
     { provide: UserLevelLookupService, useClass: UserLevelLookupServiceImpl },
+    FindAdminBoardListUseCase,
   ],
 })
 export class BoardModule {}
