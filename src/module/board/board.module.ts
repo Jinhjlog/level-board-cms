@@ -26,13 +26,13 @@ import {
   PostQueryServiceImpl,
   UserLevelLookupServiceImpl,
 } from './infra/services';
+import { FindBoardListUseCase } from './application/usecases/find-board-list.usecase';
 import { FindPostListUseCase } from './application/usecases';
 import { FindPostDetailUseCase } from './application/usecases';
 
 /**
  * 게시판 CMS BC (board).
- * F단계: Domain(애그리거트/VO/Repository·Service 인터페이스) + Infra(구현/Mapper) 바인딩.
- * ⚠️ Application(UseCase) + file-upload OHS 소비는 G단계에서 추가한다.
+ * G단계: FindBoardListUseCase(SPEC 4.5) 추가.
  */
 @Module({
   controllers: [
@@ -48,6 +48,7 @@ import { FindPostDetailUseCase } from './application/usecases';
     { provide: BoardQueryService, useClass: BoardQueryServiceImpl },
     { provide: PostQueryService, useClass: PostQueryServiceImpl },
     { provide: UserLevelLookupService, useClass: UserLevelLookupServiceImpl },
+    FindBoardListUseCase,
     FindPostListUseCase,
     FindPostDetailUseCase,
     FindAdminBoardListUseCase,

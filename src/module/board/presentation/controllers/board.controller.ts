@@ -29,18 +29,23 @@ import {
   PostDetailResponseDto,
   PostListResponseDto,
 } from '../dtos/response';
+import { FindBoardListUseCase } from '../../application/usecases/find-board-list.usecase';
+import { BoardTransformer } from '../transformers/board.transformer';
 import { FindPostListUseCase } from '../../application/usecases';
 import { PostTransformer } from '../transformers/post.transformer';
 
 /**
  * 회원용 게시판/글 (게시판 목록·글 목록·글 작성) — SPEC 4.5/4.6/4.8.
- * ⚠️ D단계 Mock: 핸들러는 계약 형태의 더미를 반환. 레벨 게이트·작성은 G단계 UseCase에서.
  */
 @ApiTags('게시판')
 @UserAuth()
 @Controller({ path: 'boards', version: '1' })
 export class BoardController {
-  constructor(private readonly findPostListUseCase: FindPostListUseCase) {}
+  constructor(
+    private readonly findBoardListUseCase: FindBoardListUseCase,
+    private readonly findPostListUseCase: FindPostListUseCase,
+  ) {}
+
   @ApiOperation({
     summary: '게시판 목록 조회',
     description:
@@ -54,8 +59,14 @@ export class BoardController {
   })
   @HttpCode(HttpStatus.OK)
   @Get()
-  getBoardList(@Query() _dto: GetBoardListRequestDto): BoardListResponseDto {
-    return MOCK_BOARD_LIST;
+  async getBoardList(
+    @Query() dto: GetBoardListRequestDto,
+  ): Promise<BoardListResponseDto> {
+    const result = await this.findBoardListUseCase.execute({
+      page: dto.page ?? 1,
+      limit: dto.limit ?? 20,
+    });
+    return BoardTransformer.toListResponse(result);
   }
 
   @ApiOperation({
@@ -136,14 +147,6 @@ export class BoardController {
     return MOCK_POST_DETAIL;
   }
 }
-
-// --- D단계 Mock 데이터 (G단계에서 제거) ---
-const MOCK_BOARD_LIST: BoardListResponseDto = {
-  items: [],
-  totalCount: 0,
-  totalPages: 0,
-  currentPage: 1,
-};
 
 const MOCK_POST_DETAIL: PostDetailResponseDto = {
   id: '01HXK3G5N7MZQR8BVWEY6JKFP4',
