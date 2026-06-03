@@ -6,6 +6,7 @@ import {
   Phone,
   UniqueEntityId,
 } from '@lib/domain';
+import { Level } from './level';
 
 export interface UserProps {
   id?: string;
@@ -14,6 +15,7 @@ export interface UserProps {
   name?: BoundedString;
   phone?: Phone;
   isActive: boolean;
+  level: number;
   createdAt: Date;
   updatedAt: Date;
   deletedAt?: Date;
@@ -44,6 +46,10 @@ export class User extends AggregateRoot<UserProps> {
     return this.props.isActive;
   }
 
+  get level(): number {
+    return this.props.level;
+  }
+
   get createdAt(): Date {
     return this.props.createdAt;
   }
@@ -66,13 +72,23 @@ export class User extends AggregateRoot<UserProps> {
     this.props.updatedAt = new Date();
   }
 
+  /** 회원 레벨을 변경합니다 (검증된 Level VO 주입). */
+  changeLevel(level: Level): void {
+    this.props.level = level.value;
+    this.props.updatedAt = new Date();
+  }
+
   static create(
-    props: Omit<UserProps, 'id' | 'isActive' | 'createdAt' | 'updatedAt'>,
+    props: Omit<
+      UserProps,
+      'id' | 'isActive' | 'level' | 'createdAt' | 'updatedAt'
+    >,
   ): User {
     const now = new Date();
     return new User({
       ...props,
       isActive: true,
+      level: 1,
       createdAt: now,
       updatedAt: now,
     });
