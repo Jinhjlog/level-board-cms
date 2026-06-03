@@ -26,6 +26,7 @@ import {
   PostQueryServiceImpl,
   UserLevelLookupServiceImpl,
 } from './infra/services';
+import { FindPostDetailUseCase } from './application/usecases';
 
 /**
  * 게시판 CMS BC (board).
@@ -46,6 +47,7 @@ import {
     { provide: BoardQueryService, useClass: BoardQueryServiceImpl },
     { provide: PostQueryService, useClass: PostQueryServiceImpl },
     { provide: UserLevelLookupService, useClass: UserLevelLookupServiceImpl },
+    FindPostDetailUseCase,
     FindAdminBoardListUseCase,
   ],
 })

@@ -25,6 +25,8 @@ import {
   CommentDetailResponseDto,
   PostDetailResponseDto,
 } from '../dtos/response';
+import { FindPostDetailUseCase } from '../../application/usecases';
+import { PostTransformer } from '../transformers/post.transformer';
 
 /**
  * 글 상세/수정/삭제 + 댓글 작성 — SPEC 4.7/4.9/4.10/4.11.
@@ -34,6 +36,7 @@ import {
 @UserAuth()
 @Controller({ path: 'posts', version: '1' })
 export class PostController {
+  constructor(private readonly findPostDetailUseCase: FindPostDetailUseCase) {}
   @ApiOperation({
     summary: '글 상세 조회',
     description:
@@ -57,8 +60,15 @@ export class PostController {
   })
   @HttpCode(HttpStatus.OK)
   @Get(':postId')
-  getPostDetail(@Param('postId') _postId: string): PostDetailResponseDto {
-    return MOCK_POST_DETAIL;
+  async getPostDetail(
+    @Param('postId') postId: string,
+    @CurrentUser('userId') userId: string,
+  ): Promise<PostDetailResponseDto> {
+    const readModel = await this.findPostDetailUseCase.execute({
+      postId,
+      userId,
+    });
+    return PostTransformer.toDetailResponse(readModel);
   }
 
   @ApiOperation({
