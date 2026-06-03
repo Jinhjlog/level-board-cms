@@ -26,6 +26,7 @@ import {
   PostQueryServiceImpl,
   UserLevelLookupServiceImpl,
 } from './infra/services';
+import { FindPostListUseCase } from './application/usecases';
 import { FindPostDetailUseCase } from './application/usecases';
 
 /**
@@ -47,6 +48,7 @@ import { FindPostDetailUseCase } from './application/usecases';
     { provide: BoardQueryService, useClass: BoardQueryServiceImpl },
     { provide: PostQueryService, useClass: PostQueryServiceImpl },
     { provide: UserLevelLookupService, useClass: UserLevelLookupServiceImpl },
+    FindPostListUseCase,
     FindPostDetailUseCase,
     FindAdminBoardListUseCase,
   ],
