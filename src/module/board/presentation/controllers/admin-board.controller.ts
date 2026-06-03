@@ -31,6 +31,7 @@ import {
   BoardDetailResponseDto,
 } from '../dtos/response';
 import { FindAdminBoardListUseCase } from '../../application/usecases/find-admin-board-list.usecase';
+import { DeleteBoardUseCase } from '../../application/usecases/delete-board.usecase';
 import { AdminBoardTransformer } from '../transformers/admin-board.transformer';
 
 /**
@@ -42,6 +43,7 @@ import { AdminBoardTransformer } from '../transformers/admin-board.transformer';
 export class AdminBoardController {
   constructor(
     private readonly findAdminBoardListUseCase: FindAdminBoardListUseCase,
+    private readonly deleteBoardUseCase: DeleteBoardUseCase,
   ) {}
   @ApiOperation({
     summary: '게시판 생성 [최고관리자]',
@@ -114,8 +116,8 @@ export class AdminBoardController {
   })
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':boardId')
-  deleteBoard(@Param('boardId') _boardId: string): void {
-    return;
+  async deleteBoard(@Param('boardId') boardId: string): Promise<void> {
+    await this.deleteBoardUseCase.execute(boardId);
   }
 
   @ApiOperation({
