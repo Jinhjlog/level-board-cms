@@ -27,6 +27,7 @@ import {
 } from '../dtos/response';
 import {
   FindPostDetailUseCase,
+  DeletePostUseCase,
   UpdatePostUseCase,
 } from '../../application/usecases';
 import { PostTransformer } from '../transformers/post.transformer';
@@ -41,6 +42,7 @@ import { PostTransformer } from '../transformers/post.transformer';
 export class PostController {
   constructor(
     private readonly findPostDetailUseCase: FindPostDetailUseCase,
+    private readonly deletePostUseCase: DeletePostUseCase,
     private readonly updatePostUseCase: UpdatePostUseCase,
   ) {}
   @ApiOperation({
@@ -133,8 +135,11 @@ export class PostController {
   })
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(':postId')
-  deletePost(@Param('postId') _postId: string): void {
-    return;
+  async deletePost(
+    @Param('postId') postId: string,
+    @CurrentUser('userId') userId: string,
+  ): Promise<void> {
+    await this.deletePostUseCase.execute({ postId, userId });
   }
 
   @ApiOperation({

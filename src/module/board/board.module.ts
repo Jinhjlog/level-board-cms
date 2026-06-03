@@ -34,13 +34,14 @@ import {
   UpdateBoardUseCase,
   DeleteBoardUseCase,
   UpdatePostUseCase,
+  DeletePostUseCase,
   FindAdminBoardListUseCase,
 } from './application/usecases';
 import { FileUploadModule } from '../file-upload/file-upload.module';
 
 /**
  * 게시판 CMS BC (board).
- * G단계: FindBoardListUseCase(SPEC 4.5) 추가.
+ * G단계: FindBoardListUseCase(SPEC 4.5) 추가. DeletePostUseCase(SPEC 4.10) 추가.
  */
 @Module({
   imports: [FileUploadModule],
@@ -62,6 +63,7 @@ import { FileUploadModule } from '../file-upload/file-upload.module';
     FindPostListUseCase,
     FindPostDetailUseCase,
     FindAdminBoardListUseCase,
+    DeletePostUseCase,
     UpdatePostUseCase,
     DeleteBoardUseCase,
     UpdateBoardUseCase,
