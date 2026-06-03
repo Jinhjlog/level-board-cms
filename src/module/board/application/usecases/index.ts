@@ -1,3 +1,4 @@
+export * from './create-board.usecase';
 export * from './find-board-list.usecase';
 export * from './find-post-list.usecase';
 export * from './find-post-detail.usecase';
